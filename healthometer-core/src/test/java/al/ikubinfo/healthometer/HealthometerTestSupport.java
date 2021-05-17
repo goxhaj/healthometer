@@ -18,16 +18,15 @@ public abstract class HealthometerTestSupport {
 
   @Autowired protected MockMvc mockMvc;
 
-  public abstract String getToken();
-
-  protected <INPUT, OUTPUT> OUTPUT createPost(String url, INPUT dto, Class<OUTPUT> objectType) {
+  protected <INPUT, OUTPUT> OUTPUT createPost(
+      String url, INPUT dto, Class<OUTPUT> objectType, String token) {
     OUTPUT resultDto = null;
     try {
       val result =
           mockMvc
               .perform(
                   MockMvcRequestBuilders.post(url)
-                      .header("Authorization", getToken())
+                      .header("Authorization", token)
                       .contentType(MediaType.APPLICATION_JSON)
                       .content(JsonUtils.toJsonString(dto)))
               .andExpect(status().isOk())
@@ -41,14 +40,14 @@ public abstract class HealthometerTestSupport {
     return resultDto;
   }
 
-  protected <OUTPUT> OUTPUT createGet(String url, Class<OUTPUT> objectType) {
+  protected <OUTPUT> OUTPUT createGet(String url, Class<OUTPUT> objectType, String token) {
     OUTPUT resultDto = null;
     try {
       val result =
           mockMvc
               .perform(
                   MockMvcRequestBuilders.get(url)
-                      .header("Authorization", getToken())
+                      .header("Authorization", token)
                       .contentType(MediaType.APPLICATION_JSON))
               .andExpect(status().isOk())
               .andReturn();
@@ -59,5 +58,42 @@ public abstract class HealthometerTestSupport {
     }
 
     return resultDto;
+  }
+
+  protected <INPUT, OUTPUT> OUTPUT createPut(
+      String url, INPUT dto, Class<OUTPUT> objectType, String token) {
+    OUTPUT resultDto = null;
+    try {
+      val result =
+          mockMvc
+              .perform(
+                  MockMvcRequestBuilders.put(url, "id")
+                      .header("Authorization", token)
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content(JsonUtils.toJsonString(dto)))
+              .andExpect(status().isOk())
+              .andReturn();
+
+      resultDto = JsonUtils.toObject(result.getResponse().getContentAsString(), objectType);
+    } catch (Exception e) {
+      ExceptionUtils.rethrow(e);
+    }
+    return resultDto;
+  }
+
+  protected void createDelete(String url, String token) {
+    try {
+      val result =
+          mockMvc
+              .perform(
+                  MockMvcRequestBuilders.delete(url)
+                      .header("Authorization", token)
+                      .contentType(MediaType.APPLICATION_JSON))
+              .andExpect(status().isOk())
+              .andReturn();
+
+    } catch (Exception e) {
+      ExceptionUtils.rethrow(e);
+    }
   }
 }

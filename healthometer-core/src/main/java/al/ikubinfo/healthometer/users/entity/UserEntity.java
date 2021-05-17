@@ -13,11 +13,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class UserEntity extends BaseEntity {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "id")
-  protected Long id;
-
   @Column(name = "email")
   private String email;
 

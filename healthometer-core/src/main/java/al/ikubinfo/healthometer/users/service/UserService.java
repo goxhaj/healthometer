@@ -89,6 +89,7 @@ public class UserService implements UserDetailsService {
 
   private boolean isLoggedInUser(Long id) {
     val user = userRepository.findByUsername(SecurityUtils.getCurrentUsername().get());
+    if (user == null) return false;
     return id.equals(user.getId());
   }
 
